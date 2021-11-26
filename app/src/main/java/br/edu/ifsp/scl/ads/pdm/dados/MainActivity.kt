@@ -1,6 +1,7 @@
 package br.edu.ifsp.scl.ads.pdm.dados
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -10,6 +11,10 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import br.edu.ifsp.scl.ads.pdm.dados.MainActivity.Constantes.CONFIGURACOES_ARQUIVO
+import br.edu.ifsp.scl.ads.pdm.dados.MainActivity.Constantes.NUMERO_DADOS_ATRIBUTO
+import br.edu.ifsp.scl.ads.pdm.dados.MainActivity.Constantes.NUMERO_FACES_ATRIBUTO
+import br.edu.ifsp.scl.ads.pdm.dados.MainActivity.Constantes.VALOR_NAO_ENCONTRADO
 import br.edu.ifsp.scl.ads.pdm.dados.databinding.ActivityMainBinding
 import kotlin.random.Random
 import kotlin.random.nextInt
@@ -17,6 +22,15 @@ import kotlin.random.nextInt
 class MainActivity : AppCompatActivity() {
     private lateinit var activityMainBinding: ActivityMainBinding
     private lateinit var geradorRandomico: Random
+
+    private object Constantes {
+        const val CONFIGURACOES_ARQUIVO = "configuracoes"
+        const val NUMERO_DADOS_ATRIBUTO = "numeroDados"
+        const val NUMERO_FACES_ATRIBUTO = "numeroFaces"
+        const val VALOR_NAO_ENCONTRADO = -1
+    }
+
+    private lateinit var configuracoesSharedPreferences: SharedPreferences
 
     private lateinit var settingsActivityLauncher: ActivityResultLauncher<Intent>
 
@@ -30,6 +44,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(activityMainBinding.root)
 
         geradorRandomico = Random(System.currentTimeMillis())
+
+        configuracoesSharedPreferences = getSharedPreferences(CONFIGURACOES_ARQUIVO, MODE_PRIVATE)
+        carregaConfiguracoes()
 
         activityMainBinding.jogarDadoBt.setOnClickListener {
             val resultado1: Int = geradorRandomico.nextInt(1..numeroFaces)
@@ -88,5 +105,16 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return false
+    }
+
+    private fun carregaConfiguracoes() {
+        val numeroDados: Int = configuracoesSharedPreferences.getInt(NUMERO_DADOS_ATRIBUTO, VALOR_NAO_ENCONTRADO)
+        val numeroFaces: Int = configuracoesSharedPreferences.getInt(NUMERO_FACES_ATRIBUTO, VALOR_NAO_ENCONTRADO)
+        if (numeroDados != VALOR_NAO_ENCONTRADO) {
+            this.numeroDados = numeroDados
+        }
+        if (numeroFaces != -1) {
+            this.numeroFaces = numeroFaces
+        }
     }
 }
